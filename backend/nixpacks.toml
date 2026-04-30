@@ -2,4 +2,4 @@
 nixPkgs = ["nodejs_22"]
 
 [start]
-cmd = "node src/server.js"
+cmd = "node --experimental-sqlite src/server.js"
