@@ -9,13 +9,13 @@
 # Proxy /api/* to your Railway backend — no CORS issues
 [[redirects]]
   from   = "/api/*"
-  to     = "https://YOUR-RAILWAY-URL.railway.app/api/:splat"
+  to     = "https://careeros-production-66af.up.railway.app/api/:splat"
   status = 200
   force  = true
 
 [[redirects]]
   from   = "/health"
-  to     = "https://YOUR-RAILWAY-URL.railway.app/health"
+  to     = "https://careeros-production-66af.up.railway.app/health"
   status = 200
   force  = true
 
