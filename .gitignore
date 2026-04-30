@@ -1,0 +1,33 @@
+# Environment
+.env
+*.env.local
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Build output
+dist/
+build/
+.vite/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Temp
+*.tmp
+*.bak

@@ -1,0 +1,26 @@
+[build]
+  base    = ""
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Proxy /api/* to your Railway backend — no CORS issues
+[[redirects]]
+  from   = "/api/*"
+  to     = "https://YOUR-RAILWAY-URL.railway.app/api/:splat"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/health"
+  to     = "https://YOUR-RAILWAY-URL.railway.app/health"
+  status = 200
+  force  = true
+
+# SPA fallback — all routes → index.html
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
