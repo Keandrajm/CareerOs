@@ -6,6 +6,10 @@ $FrontendDir = Join-Path $ProjectRoot 'frontend'
 $BackendPort = 3001
 $FrontendPort = 5173
 $DashboardUrl = "http://localhost:$FrontendPort"
+$PhoneIp = (Get-NetIPAddress -AddressFamily IPv4 |
+  Where-Object { $_.IPAddress -notlike '127.*' -and $_.PrefixOrigin -ne 'WellKnown' -and $_.InterfaceAlias -notmatch 'Loopback|vEthernet' } |
+  Select-Object -First 1 -ExpandProperty IPAddress)
+$PhoneUrl = if ($PhoneIp) { "http://$PhoneIp`:$FrontendPort" } else { $DashboardUrl }
 Add-Type -AssemblyName System.Windows.Forms
 
 function Test-Port {
@@ -54,12 +58,27 @@ if (-not (Test-Port -Port $BackendPort)) {
 }
 
 if (-not (Test-Port -Port $FrontendPort)) {
-  Start-ServiceWindow -Title 'CareerOS Frontend' -WorkingDirectory $FrontendDir -Command 'npm run dev -- --host 127.0.0.1'
+  Start-ServiceWindow -Title 'CareerOS Frontend' -WorkingDirectory $FrontendDir -Command 'npm run dev -- --host 0.0.0.0'
 }
 
 $frontendReady = Wait-Port -Port $FrontendPort -Seconds 60
 if ($frontendReady) {
   Start-Process $DashboardUrl
+  if ($PhoneIp) {
+    $phoneLinkPath = Join-Path $ProjectRoot 'CareerOS-Phone-Link.html'
+    @"
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>CareerOS Phone Link</title></head>
+<body style="font-family:Segoe UI,Arial,sans-serif;padding:32px;line-height:1.5">
+  <h1>CareerOS Phone Link</h1>
+  <p>Open this on your phone while it is connected to the same Wi-Fi as this computer:</p>
+  <p><a style="font-size:24px" href="$PhoneUrl">$PhoneUrl</a></p>
+  <p>Use your CareerOS access code when prompted.</p>
+</body>
+</html>
+"@ | Set-Content -Path $phoneLinkPath -Encoding UTF8
+  }
 } else {
   [System.Windows.Forms.MessageBox]::Show(
     "CareerOS frontend did not start within 60 seconds. Check the CareerOS Frontend window.",
