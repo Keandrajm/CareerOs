@@ -71,6 +71,8 @@ The backend can run on Railway or Render as a long-running Node service. When de
 
 The frontend can run on Netlify, Render static sites, Vercel, or any static host.
 
+For a free scheduled option, GitHub Actions can run scans and send Discord updates from `.github/workflows/careeros-scan.yml`. This does not keep the interactive Discord bot online, but it does keep scan/report automation running while your laptop is closed.
+
 ## Safety
 
 - No auto-apply

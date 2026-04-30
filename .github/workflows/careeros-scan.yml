@@ -1,0 +1,65 @@
+name: CareerOS Scheduled Scan
+
+on:
+  workflow_dispatch:
+  schedule:
+    # UTC equivalents of 7 AM, 11 AM, 3 PM, 7 PM America/Los_Angeles during PDT.
+    - cron: "0 14,18,22 * * *"
+    - cron: "0 2 * * *"
+
+concurrency:
+  group: careeros-scheduled-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    name: Scan job boards and notify Discord
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    defaults:
+      run:
+        working-directory: backend
+
+    env:
+      NODE_ENV: production
+      TZ: America/Los_Angeles
+      DATABASE_URL: ./src/data/github-actions-careeros.sqlite
+      DASHBOARD_URL: ${{ secrets.DASHBOARD_URL }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      DISCORD_CHAT_WEBHOOK_URL: ${{ secrets.DISCORD_CHAT_WEBHOOK_URL }}
+      AI_PROVIDER: ${{ secrets.AI_PROVIDER }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
+      CANDIDATE_PROFILE_TEXT: ${{ secrets.CANDIDATE_PROFILE_TEXT }}
+      CANDIDATE_RESUME_SUMMARY: ${{ secrets.CANDIDATE_RESUME_SUMMARY }}
+      CANDIDATE_PORTFOLIO_URL: ${{ secrets.CANDIDATE_PORTFOLIO_URL }}
+      GITHUB_ACTION_SCAN_REASON: github-actions-scheduled
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        run: npm ci --omit=dev
+
+      - name: Run CareerOS scan
+        run: npm run scan:github
+
+      - name: Upload runner database and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: careeros-runner-data
+          path: |
+            backend/src/data/github-actions-careeros.sqlite
+          retention-days: 7

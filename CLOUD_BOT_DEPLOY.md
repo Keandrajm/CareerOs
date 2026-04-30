@@ -56,3 +56,32 @@ After cloud deploy:
 3. Try `status`.
 4. Try `prefer implementation operations`.
 5. Check Bot Logs in the dashboard.
+
+## Free Fallback: GitHub Actions Scheduler
+
+GitHub Actions can run scheduled scans for free and send Discord webhook updates while your laptop is closed.
+
+Limitations:
+
+- It does not keep the interactive Discord bot online.
+- It runs in a temporary GitHub runner, so job data is not automatically written back into your local dashboard database.
+- It can upload the runner SQLite database as an artifact for inspection.
+
+Required GitHub repository secrets:
+
+```text
+DISCORD_WEBHOOK_URL
+DISCORD_CHAT_WEBHOOK_URL
+DASHBOARD_URL
+OPENAI_API_KEY
+AI_PROVIDER
+CANDIDATE_PROFILE_TEXT
+CANDIDATE_RESUME_SUMMARY
+CANDIDATE_PORTFOLIO_URL
+```
+
+Workflow file:
+
+```text
+.github/workflows/careeros-scan.yml
+```
