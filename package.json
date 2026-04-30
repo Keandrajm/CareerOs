@@ -6,7 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "cd backend && npm start",
-    "install:backend": "cd backend && npm install"
+    "install:backend": "cd backend && npm install",
+    "postinstall": "npm --prefix backend ci --omit=dev"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   },
   "keywords": [],
   "author": "",
