@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { clearAccessKey, getAccessKey } from './security.js';
 
 // In production (Netlify), VITE_API_URL is empty and Netlify's redirect
 // proxy handles /api/* → Railway backend. In dev, Vite proxy does the same.
@@ -12,6 +13,23 @@ const api = axios.create({
   timeout: 60000,
   headers: { 'Content-Type': 'application/json' }
 });
+
+api.interceptors.request.use((config) => {
+  const accessKey = getAccessKey();
+  if (accessKey) config.headers['X-CareerOS-Key'] = accessKey;
+  return config;
+});
+
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response?.status === 401) {
+      clearAccessKey();
+      window.location.reload();
+    }
+    return Promise.reject(error);
+  }
+);
 
 // ── Jobs ──────────────────────────────────────────────────────────────────────
 export const getJobs      = (params = {}) => api.get('/jobs', { params });

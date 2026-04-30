@@ -72,6 +72,10 @@ ANTHROPIC_API_KEY=your-anthropic-api-key
 AI_PROVIDER=openai             # or: anthropic
 DISCORD_WEBHOOK_URL=your-discord-webhook-url
 DASHBOARD_URL=http://localhost:5173
+ALLOWED_ORIGINS=http://localhost:5173
+CAREEROS_API_KEY=change-this-private-dashboard-key
+RATE_LIMIT_MAX=300
+MUTATION_RATE_LIMIT_MAX=40
 NODE_ENV=development
 ```
 
@@ -212,6 +216,10 @@ git push -u origin main
 | `AI_PROVIDER` | No | `openai` or `anthropic` (default: openai) |
 | `DISCORD_WEBHOOK_URL` | No | Discord webhook for notifications |
 | `DASHBOARD_URL` | No | Frontend URL for Discord links |
+| `ALLOWED_ORIGINS` | Recommended | Comma-separated allowed dashboard origins |
+| `CAREEROS_API_KEY` | Recommended | Private dashboard access key required by API when set |
+| `RATE_LIMIT_MAX` | No | API request limit per 15 minutes |
+| `MUTATION_RATE_LIMIT_MAX` | No | Write request limit per minute |
 | `NODE_ENV` | No | `development` or `production` |
 | `TZ` | Recommended | `America/Los_Angeles` for Pacific cron timing |
 

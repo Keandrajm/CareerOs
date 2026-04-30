@@ -10,6 +10,8 @@ import ManualApply from './pages/ManualApply.jsx';
 import Approved from './pages/Approved.jsx';
 import Submitted from './pages/Submitted.jsx';
 import BotLogs from './pages/BotLogs.jsx';
+import AccessGate from './components/AccessGate.jsx';
+import { clearAccessKey } from './security.js';
 import { triggerScan, ingestSample } from './api.js';
 
 const NAV = [
@@ -62,6 +64,7 @@ export default function App() {
   }
 
   return (
+    <AccessGate>
     <div className="app">
       <aside className="sidebar">
         <div className="sidebar-header">
@@ -81,6 +84,9 @@ export default function App() {
           </button>
           <button className="btn btn-secondary" onClick={handleIngest} disabled={ingesting}>
             {ingesting ? 'Loading...' : 'Load Sample Jobs'}
+          </button>
+          <button className="btn btn-secondary" onClick={() => { clearAccessKey(); window.location.reload(); }}>
+            Lock
           </button>
         </div>
       </aside>
@@ -103,5 +109,6 @@ export default function App() {
         </Routes>
       </main>
     </div>
+    </AccessGate>
   );
 }

@@ -40,6 +40,11 @@ git push -u origin main
 | `OPENAI_API_KEY` | your key |
 | `DISCORD_WEBHOOK_URL` | your webhook |
 | `AI_PROVIDER` | `openai` |
+| `DASHBOARD_URL` | your Netlify URL |
+| `ALLOWED_ORIGINS` | your Netlify URL |
+| `CAREEROS_API_KEY` | a long private dashboard access key |
+| `RATE_LIMIT_MAX` | `300` |
+| `MUTATION_RATE_LIMIT_MAX` | `40` |
 | `NODE_ENV` | `production` |
 | `TZ` | `America/Los_Angeles` |
 
@@ -62,6 +67,14 @@ git push -u origin main
    git push
    ```
 8. Netlify will auto-deploy. Your dashboard will be live at `https://your-site.netlify.app`
+
+## Security Checklist
+
+- Rotate any key that was ever exposed locally or in deployment logs.
+- Set `CAREEROS_API_KEY` in Railway and enter that same value when the dashboard asks for access.
+- Set `DASHBOARD_URL` and `ALLOWED_ORIGINS` in Railway to your exact Netlify URL.
+- Do not put OpenAI, Gemini, Anthropic, or Discord secrets in Netlify.
+- Keep Netlify indexing disabled with the included `X-Robots-Tag` header.
 
 ---
 
