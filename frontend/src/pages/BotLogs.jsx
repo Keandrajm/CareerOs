@@ -4,7 +4,8 @@ import { getLogs } from '../api.js';
 
 const EVENT_TYPES = ['', 'scan_start', 'scan_fetch', 'scan_complete', 'scored', 'filter_reject',
   'ingest', 'approval', 'draft_resume', 'draft_cover', 'packet_start', 'packet_created',
-  'source_scan', 'error', 'ai_error'];
+  'source_scan', 'url_check_start', 'url_check_complete', 'broken_link', 'system_learning',
+  'system_check_start', 'system_check_complete', 'scan_skip', 'error', 'ai_error'];
 
 export default function BotLogs() {
   const [logs, setLogs] = useState([]);

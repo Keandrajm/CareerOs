@@ -47,8 +47,26 @@ app.use('/api/logs', logsRouter);
 
 app.post('/api/scheduler/trigger', async (req, res) => {
   try {
-    scheduler.runScan();
+    scheduler.runScan('manual-api').catch(err => console.error('[Scheduler] Manual scan failed:', err.message));
     res.json({ status: 'triggered', message: 'Manual scan started' });
+  } catch (err) {
+    res.status(500).json({ error: err.message, requestId: req.id });
+  }
+});
+
+app.post('/api/scheduler/url-check', async (req, res) => {
+  try {
+    const result = await scheduler.runDailyUrlCheck();
+    res.json({ status: 'complete', result });
+  } catch (err) {
+    res.status(500).json({ error: err.message, requestId: req.id });
+  }
+});
+
+app.post('/api/scheduler/system-check', async (req, res) => {
+  try {
+    const result = await scheduler.runDailySystemCheck();
+    res.json({ status: 'complete', result });
   } catch (err) {
     res.status(500).json({ error: err.message, requestId: req.id });
   }

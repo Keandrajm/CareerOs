@@ -1,5 +1,6 @@
 const db = require('../db');
 const { logEvent } = require('../routes/logs');
+const learningService = require('./learningService');
 
 // ── Candidate profile constants ───────────────────────────────────────────────
 const TARGET_SALARY_MIN = 80000;
@@ -182,7 +183,7 @@ async function scoreAndSaveJob(job) {
     }
 
     // Score the job
-    const scores = scoreJob(job);
+    const scores = learningService.applyPreferenceAdjustment(job, scoreJob(job));
 
     // Persist score
     db.prepare(`

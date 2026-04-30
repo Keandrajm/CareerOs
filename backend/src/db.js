@@ -125,6 +125,23 @@ db.exec(`
     details_json TEXT,
     created_at TEXT DEFAULT (datetime('now'))
   );
+  CREATE TABLE IF NOT EXISTS job_url_checks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    job_id INTEGER,
+    url TEXT NOT NULL,
+    url_type TEXT,
+    status_code INTEGER,
+    ok INTEGER DEFAULT 0,
+    error_message TEXT,
+    checked_at TEXT DEFAULT (datetime('now'))
+  );
+  CREATE TABLE IF NOT EXISTS system_insights (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    insight_key TEXT UNIQUE,
+    insight_json TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
 `);
 
 console.log('[DB] Database ready:', dbPath);

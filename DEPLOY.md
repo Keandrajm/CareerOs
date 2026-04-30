@@ -45,6 +45,10 @@ git push -u origin main
 | `CAREEROS_API_KEY` | a long private dashboard access key |
 | `RATE_LIMIT_MAX` | `300` |
 | `MUTATION_RATE_LIMIT_MAX` | `40` |
+| `SCAN_CRON` | `0 7,11,15,19 * * *` |
+| `URL_CHECK_CRON` | `25 6 * * *` |
+| `SYSTEM_CHECK_CRON` | `45 6 * * *` |
+| `URL_CHECK_LIMIT` | `150` |
 | `NODE_ENV` | `production` |
 | `TZ` | `America/Los_Angeles` |
 

@@ -76,6 +76,10 @@ ALLOWED_ORIGINS=http://localhost:5173
 CAREEROS_API_KEY=change-this-private-dashboard-key
 RATE_LIMIT_MAX=300
 MUTATION_RATE_LIMIT_MAX=40
+SCAN_CRON=0 7,11,15,19 * * *
+URL_CHECK_CRON=25 6 * * *
+SYSTEM_CHECK_CRON=45 6 * * *
+URL_CHECK_LIMIT=150
 NODE_ENV=development
 ```
 
@@ -220,6 +224,10 @@ git push -u origin main
 | `CAREEROS_API_KEY` | Recommended | Private dashboard access key required by API when set |
 | `RATE_LIMIT_MAX` | No | API request limit per 15 minutes |
 | `MUTATION_RATE_LIMIT_MAX` | No | Write request limit per minute |
+| `SCAN_CRON` | No | Live job feed refresh schedule; default 7 AM, 11 AM, 3 PM, 7 PM Pacific |
+| `URL_CHECK_CRON` | No | Daily job URL validation schedule |
+| `SYSTEM_CHECK_CRON` | No | Daily learning/system check schedule |
+| `URL_CHECK_LIMIT` | No | Max active jobs checked for broken URLs each day |
 | `NODE_ENV` | No | `development` or `production` |
 | `TZ` | Recommended | `America/Los_Angeles` for Pacific cron timing |
 
@@ -247,9 +255,16 @@ git push -u origin main
 - [ ] Rejected page shows 1 rejected job
 - [ ] "Score" button on a job updates its score
 - [ ] "Generate Packet" creates a packet (requires AI API key)
-- [ ] Bot Logs page shows activity entries
+- [ ] Bot Logs page shows scan, URL check, and system learning activity entries
 - [ ] Approve / Reject / Save / Self-Applied buttons update job status
 - [ ] Discord notification received on scan complete (if webhook configured)
+
+## Automation Rhythm
+
+- Live job feeds refresh four times daily by default: 7 AM, 11 AM, 3 PM, and 7 PM Pacific.
+- URL accuracy checks run daily and log `broken_link` events for job or company career links that fail.
+- System learning runs daily, reads your approved, rejected, packet-ready, and self-applied jobs, and stores preference signals that can slightly boost or reduce future scores.
+- Learning is conservative: it only adjusts scores after enough review history exists and never auto-applies.
 
 ---
 
