@@ -207,6 +207,15 @@ git push -u origin main
 - Update `DASHBOARD_URL` in backend env to the deployed frontend URL
 - Update frontend's `vite.config.js` proxy target to the deployed backend URL
 
+Production frontend URL:
+`https://keandra-careeros.netlify.app`
+
+Set these Railway variables after Netlify is created:
+```
+DASHBOARD_URL=https://keandra-careeros.netlify.app
+ALLOWED_ORIGINS=https://keandra-careeros.netlify.app
+```
+
 ---
 
 ## Required Environment Variables
