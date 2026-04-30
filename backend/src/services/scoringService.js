@@ -47,6 +47,13 @@ function hardFilter(job) {
     return { passed: false, reason: 'Not U.S. or California eligible' };
   }
 
+  const location = (job.location || '').toLowerCase();
+  const outsideUSLocation = /\b(canada|chile|united arab emirates|uae|india|united kingdom|uk|europe|emea|apac|australia|brazil|mexico|germany|france|ireland|netherlands|singapore)\b/i;
+  const usLocation = /\b(united states|usa|u\.s\.|us remote|remote - us|remote, us|california|ca\b|new york|ny\b|denver|co\b|washington|seattle|chicago|illinois)\b/i;
+  if (outsideUSLocation.test(location) && !usLocation.test(location)) {
+    return { passed: false, reason: 'Location appears outside U.S. eligibility' };
+  }
+
   if (job.posted_date) {
     const posted = new Date(job.posted_date + 'T00:00:00Z');
     const cutoff = new Date(Date.now() - 7 * 86400000);
@@ -91,8 +98,8 @@ function scoreJob(job) {
     : 0;
 
   const expPatterns = [/3[\s\u2013-]+5\s*years/i, /2[\s\u2013-]+4\s*years/i, /1[\s\u2013-]+3\s*years/i, /entry[\s-]level/i, /associate/i, /mid[\s-]level/i];
-  const stretchPatterns = [/5\+\s*years/i, /5[\s\u2013-]+7\s*years/i, /senior/i];
-  const seniorPatterns = [/7\+\s*years/i, /8\+\s*years/i, /10\+\s*years/i, /director/i, /principal/i, /staff/i, /head of/i, /vice president|vp/i];
+  const stretchPatterns = [/5\+\s*years/i, /5[\s\u2013-]+7\s*years/i, /\bii\b/i, /\biii\b/i];
+  const seniorPatterns = [/7\+\s*years/i, /8\+\s*years/i, /10\+\s*years/i, /\b(sr\.?|senior)\b/i, /director/i, /principal/i, /staff/i, /head of/i, /vice president|vp/i];
   const expScore = seniorPatterns.some(p => p.test(text)) ? 5
     : stretchPatterns.some(p => p.test(text)) ? 12
     : expPatterns.some(p => p.test(text)) ? 20

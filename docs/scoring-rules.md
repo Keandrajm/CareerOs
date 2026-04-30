@@ -59,6 +59,9 @@ These can be good only when the description clearly includes operations, process
 - Software, platform, DevOps, security, ML, data engineering, analytics engineering, or solutions engineering roles
 - Product Manager roles unless they are clearly Product Operations
 - Director, VP, Head of, Principal, Staff, or 7+ year senior roles
+- Senior/Sr. titles by default, even when the function is operations or program management
+- Technical Project Manager / Technical Program Manager roles unless manually approved
+- Non-US remote/location-specific roles such as Canada-only, Chile, UAE, EMEA, APAC, UK, or Europe-only
 - Commission-only compensation
 - Relocation required or on-site only
 - PhD/doctorate required

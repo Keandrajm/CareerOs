@@ -85,6 +85,7 @@ const INGEST_TITLE_PATTERNS = [
 ];
 
 const AVOID_TITLE_PATTERNS = [
+  { pattern: /\b(sr\.?|senior)\b/i, reason: 'Senior-level role, too high for this transition search' },
   { pattern: /\b(account executive|sales development|business development|sdr|bdr)\b/i, reason: 'Sales quota role, not an operations fit' },
   { pattern: /\baccount manager\b/i, reason: 'Account management role, not operations-focused' },
   { pattern: /\b(customer support|support representative|technical support|help desk)\b/i, reason: 'Support desk role, not operations/process-focused' },
@@ -94,7 +95,9 @@ const AVOID_TITLE_PATTERNS = [
   { pattern: /\b(machine learning|ml|ai) engineer\b/i, reason: 'Advanced ML/AI engineering role' },
   { pattern: /\b(data scientist|analytics engineer|data engineer|bi engineer)\b/i, reason: 'Advanced analytics/engineering role' },
   { pattern: /\bsolutions? (engineer|architect|consultant)\b/i, reason: 'Technical solutions role likely requires deep platform expertise' },
+  { pattern: /\btechnical (project|program) manager\b/i, reason: 'Technical PM role likely requires deeper engineering delivery experience' },
   { pattern: /\bproduct manager\b/i, reason: 'Product manager role; target product operations instead' },
+  { pattern: /\b(flight test|mission autonomy|mission operations)\b/i, reason: 'Specialized defense/technical operations role, outside target path' },
   { pattern: /\b(financial analyst|accountant|controller|tax|audit)\b/i, reason: 'Finance/accounting role, outside target path' },
   { pattern: /\b(director|vp|vice president|head of|principal|staff)\b/i, reason: 'Leadership/seniority level too high for this transition search' }
 ];
@@ -139,6 +142,8 @@ const ADVANCED_TECH_REQUIREMENTS = [
   /\bdata warehouse\b/i,
   /\blooker\b/i,
   /\btableau\b/i,
+  /\bworkday\b/i,
+  /\bsalesforce administrator\b/i,
   /\bstatistics\b/i,
   /\bpredictive model/i
 ];

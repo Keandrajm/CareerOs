@@ -29,7 +29,10 @@ Transitioning from operations leadership (culinary/cafeteria management, complia
 - Sales quota roles, Account Executive, SDR, BDR, Business Development, and generic Account Manager roles.
 - Customer support/help desk roles unless clearly operations-focused.
 - Director, VP, Head of, Principal, Staff, or 7+ year senior roles.
+- Senior/Sr. titles by default unless Keandra manually approves a stretch role.
 - Heavy software engineering, ML/AI, data engineering, analytics engineering, solutions engineering, cybersecurity, finance/accounting, legal, and recruiting roles.
+- Technical Project Manager / Technical Program Manager roles unless the posting is clearly non-engineering implementation/project coordination.
+- Non-US remote roles, including Canada-only, UAE, Chile, EMEA, APAC, UK, or Europe-only postings.
 - Product Manager roles unless clearly Product Operations.
 
 ## Core Strengths
