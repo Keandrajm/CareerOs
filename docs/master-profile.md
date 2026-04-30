@@ -18,6 +18,20 @@ Transitioning from operations leadership (culinary/cafeteria management, complia
 - eCommerce / Digital Operations
 - Process Improvement / Operational Excellence
 
+## Best-Fit Search Focus
+- Remote operations roles where Keandra can use process improvement, SOPs, training, compliance, Excel reporting, Power BI portfolio work, vendor coordination, customer feedback, implementation support, and cross-functional project coordination.
+- Prioritize associate to mid-level roles, roughly 1-5 years, that ask for operations judgment and reporting/process skills over advanced technical specialization.
+- Treat data roles as best fit when they are operations/reporting/KPI/dashboard roles, not data engineering, analytics engineering, or data science.
+- Treat customer success roles as best fit when they are customer operations, onboarding, enablement, implementation, or process/reporting oriented.
+- Treat supply chain, procurement, compliance, QA, and training roles as secondary fits unless they clearly connect to operations systems, process improvement, reporting, documentation, or implementation.
+
+## Roles to Avoid in Automated Scans
+- Sales quota roles, Account Executive, SDR, BDR, Business Development, and generic Account Manager roles.
+- Customer support/help desk roles unless clearly operations-focused.
+- Director, VP, Head of, Principal, Staff, or 7+ year senior roles.
+- Heavy software engineering, ML/AI, data engineering, analytics engineering, solutions engineering, cybersecurity, finance/accounting, legal, and recruiting roles.
+- Product Manager roles unless clearly Product Operations.
+
 ## Core Strengths
 - Operations leadership and management
 - Cafeteria/kitchen operations management

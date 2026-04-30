@@ -7,6 +7,7 @@
 
 const axios = require('axios');
 const { logEvent } = require('../routes/logs');
+const { shouldIngestTitle } = require('./fitCriteria');
 
 const BASE_URL = 'https://api.ashbyhq.com/posting-api/job-board';
 
@@ -41,15 +42,6 @@ const COMPANY_SLUGS = [
   { slug: 'airtable',       name: 'Airtable' },
 ];
 
-const TARGET_KEYWORDS = [
-  'operations', 'analyst', 'project manager', 'program manager',
-  'customer success', 'business operations', 'implementation',
-  'data analyst', 'process improvement', 'onboarding specialist',
-  'operations manager', 'biz ops', 'revenue operations', 'revops',
-  'ops specialist', 'ops coordinator', 'client success', 'account manager',
-  'business analyst', 'enablement', 'customer education', 'support operations'
-];
-
 async function fetchJobsFromSlug(slug, companyName) {
   try {
     const url = `${BASE_URL}/${slug}`;
@@ -68,8 +60,7 @@ async function fetchJobsFromSlug(slug, companyName) {
 }
 
 function isTargetRole(title) {
-  const t = (title || '').toLowerCase();
-  return TARGET_KEYWORDS.some(kw => t.includes(kw));
+  return shouldIngestTitle(title || '');
 }
 
 function normalizeAshbyJob(raw, companyName, slug) {

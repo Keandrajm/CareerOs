@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node --experimental-sqlite src/server.js",
     "dev": "nodemon --exec \"node --experimental-sqlite\" src/server.js",
-    "ingest": "node src/scripts/ingestSample.js"
+    "ingest": "node src/scripts/ingestSample.js",
+    "rescore": "node --experimental-sqlite src/scripts/rescoreOpenJobs.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

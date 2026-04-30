@@ -7,6 +7,7 @@
 
 const axios = require('axios');
 const { logEvent } = require('../routes/logs');
+const { shouldIngestTitle } = require('./fitCriteria');
 
 const BASE_URL = 'https://boards-api.greenhouse.io/v1/boards';
 
@@ -69,15 +70,6 @@ const COMPANY_BOARDS = [
   { token: 'yext',         name: 'Yext' },
 ];
 
-const TARGET_KEYWORDS = [
-  'operations', 'analyst', 'project manager', 'program manager',
-  'customer success', 'business operations', 'implementation',
-  'data analyst', 'process improvement', 'onboarding specialist',
-  'operations manager', 'biz ops', 'revenue operations', 'revops',
-  'ops specialist', 'ops coordinator', 'client success', 'account manager',
-  'customer education', 'enablement', 'support operations', 'business analyst'
-];
-
 async function fetchJobsFromBoard(companyToken, companyName) {
   try {
     const url = `${BASE_URL}/${companyToken}/jobs?content=true`;
@@ -96,8 +88,7 @@ async function fetchJobsFromBoard(companyToken, companyName) {
 }
 
 function isTargetRole(title) {
-  const t = (title || '').toLowerCase();
-  return TARGET_KEYWORDS.some(kw => t.includes(kw));
+  return shouldIngestTitle(title || '');
 }
 
 function normalizeGreenhouseJob(raw, companyName, token) {

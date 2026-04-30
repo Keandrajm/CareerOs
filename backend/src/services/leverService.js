@@ -7,6 +7,7 @@
 
 const axios = require('axios');
 const { logEvent } = require('../routes/logs');
+const { shouldIngestTitle } = require('./fitCriteria');
 
 const BASE_URL = 'https://api.lever.co/v0/postings';
 
@@ -14,15 +15,6 @@ const BASE_URL = 'https://api.lever.co/v0/postings';
 const COMPANY_SLUGS = [
   { slug: 'spotify',        name: 'Spotify' },
   { slug: 'plaid',          name: 'Plaid' },
-];
-
-const TARGET_KEYWORDS = [
-  'operations', 'analyst', 'project manager', 'program manager',
-  'customer success', 'business operations', 'implementation',
-  'data analyst', 'process improvement', 'onboarding specialist',
-  'operations manager', 'biz ops', 'revenue operations', 'revops',
-  'ops specialist', 'ops coordinator', 'client success', 'account manager',
-  'business analyst', 'enablement', 'customer education'
 ];
 
 async function fetchJobsFromSlug(slug, companyName) {
@@ -43,8 +35,7 @@ async function fetchJobsFromSlug(slug, companyName) {
 }
 
 function isTargetRole(title) {
-  const t = (title || '').toLowerCase();
-  return TARGET_KEYWORDS.some(kw => t.includes(kw));
+  return shouldIngestTitle(title || '');
 }
 
 function normalizeLeverJob(raw, companyName, slug) {
