@@ -82,7 +82,7 @@ function init() {
     partials: [Partials.Channel]
   });
 
-  client.once('ready', () => {
+  client.once('clientReady', () => {
     console.log(`[DiscordBot] Logged in as ${client.user.tag}`);
     logEvent('system_check', 'Discord bot listener connected', { bot: client.user.tag });
   });

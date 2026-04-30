@@ -1,0 +1,16 @@
+.git
+.gitignore
+node_modules
+backend/node_modules
+frontend/node_modules
+frontend/dist
+backend/private
+backend/.env
+backend/*.env.local
+backend/src/data
+*.sqlite
+*.sqlite3
+*.db
+CareerOS-Phone-Link.html
+npm-debug.log*
+*.log
