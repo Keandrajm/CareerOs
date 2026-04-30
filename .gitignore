@@ -1,6 +1,7 @@
 # Environment
 .env
 *.env.local
+backend/private/
 
 # Database
 *.sqlite

@@ -1,105 +1,74 @@
-# CareerOS — Deployment Guide
+# CareerOS Deployment Guide
 
-## Overview
-- **Backend** → Railway (Node.js + SQLite volume)
-- **Frontend** → Netlify (static React build)
+This guide is intentionally generic so personal paths, usernames, domains, and secrets are not published.
 
----
+## Backend Cloud Service
 
-## Step 1 — Push to GitHub
+Deploy `backend/` as a long-running Node service on Railway or Render. The Discord bot runs inside the backend process, so it stays online whenever this cloud service is healthy.
 
-Run the setup script from your CareerOS folder in PowerShell:
+Build command:
 
-```powershell
-cd "C:\Users\Keand\OneDrive\Desktop\AI Op\CareerOS"
-.\github-setup.ps1
+```bash
+npm ci --omit=dev
 ```
 
-Then create a repo at https://github.com/new named `careeros`, and push:
+Start command:
 
-```powershell
-git remote add origin https://github.com/keandrajm/careeros.git
-git push -u origin main
+```bash
+npm start
 ```
 
----
-
-## Step 2 — Deploy Backend to Railway
-
-1. Go to https://railway.app and sign in with GitHub
-2. Click **New Project → Deploy from GitHub repo** → select `careeros`
-3. Railway will detect the `backend/` folder — set **Root Directory** to `backend`
-4. Add a **Volume** (for SQLite persistence):
-   - Mount path: `/data`
-5. Set these **Environment Variables** in Railway:
+Recommended environment variables:
 
 | Variable | Value |
-|---|---|
-| `PORT` | `3001` |
-| `DATABASE_URL` | `/data/careeros.sqlite` |
-| `OPENAI_API_KEY` | your key |
-| `DISCORD_WEBHOOK_URL` | your webhook |
-| `DISCORD_CHAT_WEBHOOK_URL` | your second bot-chat webhook |
-| `DISCORD_BOT_TOKEN` | your Discord bot token |
-| `AI_PROVIDER` | `openai` |
-| `DASHBOARD_URL` | `https://keandra-careeros.netlify.app` |
-| `ALLOWED_ORIGINS` | `https://keandra-careeros.netlify.app` |
-| `CAREEROS_API_KEY` | a long private dashboard access key |
-| `RATE_LIMIT_MAX` | `300` |
-| `MUTATION_RATE_LIMIT_MAX` | `40` |
-| `SCAN_CRON` | `0 7,11,15,19 * * *` |
-| `URL_CHECK_CRON` | `25 6 * * *` |
-| `SYSTEM_CHECK_CRON` | `45 6 * * *` |
-| `URL_CHECK_LIMIT` | `150` |
-| `NODE_ENV` | `production` |
-| `TZ` | `America/Los_Angeles` |
+| --- | --- |
+| `DATABASE_URL` | Persistent SQLite path or provider database URL |
+| `CAREEROS_API_KEY` | Long private dashboard key |
+| `ALLOWED_ORIGINS` | Your deployed frontend origin |
+| `DASHBOARD_URL` | Your deployed frontend URL |
+| `AI_PROVIDER` | `openai`, `anthropic`, or `gemini` |
+| `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `GEMINI_API_KEY` | Provider key |
+| `DISCORD_WEBHOOK_URL` | Optional alert webhook |
+| `DISCORD_CHAT_WEBHOOK_URL` | Optional bot-chat webhook |
+| `DISCORD_BOT_TOKEN` | Optional two-way Discord bot token |
+| `CANDIDATE_PROFILE_TEXT` | Private candidate profile text |
+| `CANDIDATE_RESUME_SUMMARY` | Private resume summary |
+| `CANDIDATE_PORTFOLIO_URL` | Optional portfolio URL |
+| `SCAN_CRON` | Default: `0 7,11,15,19 * * *` |
+| `URL_CHECK_CRON` | Default: `25 6 * * *` |
+| `SYSTEM_CHECK_CRON` | Default: `45 6 * * *` |
+| `TZ` | Example: `America/Los_Angeles` |
 
-6. Click **Deploy**. Railway will give you a URL like `https://careeros-backend-xyz.railway.app`
+## Frontend Cloud Service
 
----
+Deploy `frontend/` as a static site.
 
-## Step 3 — Deploy Frontend to Netlify
+Build command:
 
-1. Go to https://netlify.com and sign in with GitHub
-2. Click **Add new site → Import an existing project** → select `careeros`
-3. Set **Base directory** to `frontend`
-4. Build command: `npm run build`
-5. Publish directory: `dist`
-6. Open `frontend/netlify.toml` and **replace** `YOUR-RAILWAY-URL` with your actual Railway URL
-7. Commit and push that change:
-   ```powershell
-   git add frontend/netlify.toml
-   git commit -m "Set Railway backend URL in Netlify config"
-   git push
-   ```
-8. Netlify will auto-deploy. Your dashboard will be live at `https://keandra-careeros.netlify.app`
+```bash
+npm run build
+```
+
+Publish directory:
+
+```bash
+dist
+```
+
+Set `VITE_API_URL` only if your host does not proxy `/api` and `/health`.
 
 ## Security Checklist
 
-- Rotate any key that was ever exposed locally or in deployment logs.
-- Set `CAREEROS_API_KEY` in Railway and enter that same value when the dashboard asks for access.
-- Set `DASHBOARD_URL` and `ALLOWED_ORIGINS` in Railway to `https://keandra-careeros.netlify.app`.
-- Do not put OpenAI, Gemini, Anthropic, or Discord secrets in Netlify.
-- Store both Discord webhooks only in Railway/local `.env`; never commit real webhook URLs.
-- Keep Netlify indexing disabled with the included `X-Robots-Tag` header.
+- Rotate any key that was pasted into chat, logs, screenshots, or GitHub.
+- Keep backend secrets only in cloud environment variables or ignored local `.env`.
+- Do not put AI keys, Discord tokens, webhook URLs, or private candidate profile text in frontend variables.
+- Use `CAREEROS_API_KEY`.
+- Restrict `ALLOWED_ORIGINS` to the frontend origin.
+- Keep the repository private if it contains historical private commits.
 
----
+## Verify
 
-## Step 4 — Verify Everything Works
-
-1. Visit `https://careeros-backend-xyz.railway.app/health` — should return `{"status":"ok"}`
-2. Visit your Netlify URL — CareerOS dashboard should load
-3. Click **Run Scan** — check Bot Logs for scan activity
-4. Check your Discord channel for scan completion notification
-
----
-
-## Updating the App
-
-Any `git push` to `main` will auto-redeploy both Railway and Netlify.
-
-```powershell
-git add -A
-git commit -m "your change"
-git push
-```
+- Backend `/health` returns `{"status":"ok"}`
+- Frontend loads and prompts for the access key
+- `POST /api/jobs/scan` works with `X-CareerOS-Key`
+- Discord bot logs in if `DISCORD_BOT_TOKEN` is configured

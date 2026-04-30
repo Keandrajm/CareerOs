@@ -1,41 +1,13 @@
 const axios = require('axios');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { logEvent } = require('../routes/logs');
+const { getCandidateProfile, getResumeSummary, getPortfolioUrl } = require('./candidateProfile');
 
-// ── Candidate master profile (truthful, no invented facts) ────────────────────
-const MASTER_PROFILE = `
-Keandra Morris is an operations and process improvement professional with demonstrated experience in:
-- Operations leadership and management ($500K annual budget; 12,000+ veterans served)
-- Training program development and SOP documentation
-- Compliance management and food safety certifications
-- Vendor coordination and procurement
-- Budget management and cross-functional collaboration (HR, Finance, Compliance, leadership)
-- Workflow digitization: 40% manual workload reduction through process automation
-- Excel reporting, data visualization, and Power BI portfolio work
-- Project coordination and implementation support
-- Customer feedback analysis
-- Team leadership and staff development
-- Client-facing and customer success experience
-
-She is transitioning into remote roles in: business operations, project management, BI/data analytics, customer success operations, systems/workflow automation, eCommerce operations, and process improvement.
-
-Portfolio: https://keandrajm.github.io/PM_Portfolio/
-`;
-
-const MASTER_RESUME_SUMMARY = `
-Operations and process improvement professional with a track record of managing large-scale operations, building training programs, and driving measurable efficiency gains. Skilled in Excel, Power BI, SOP documentation, compliance, vendor management, and cross-functional project coordination. Transitioning into remote business operations, project management, data analytics, and customer success roles.
-`;
-
-// ── AI caller ─────────────────────────────────────────────────────────────────
 async function callAI(systemPrompt, userPrompt) {
   const provider = (process.env.AI_PROVIDER || 'openai').toLowerCase();
 
-  if (provider === 'anthropic' || provider === 'claude') {
-    return callAnthropic(systemPrompt, userPrompt);
-  }
-  if (provider === 'gemini' || provider === 'google') {
-    return callGemini(systemPrompt, userPrompt);
-  }
+  if (provider === 'anthropic' || provider === 'claude') return callAnthropic(systemPrompt, userPrompt);
+  if (provider === 'gemini' || provider === 'google') return callGemini(systemPrompt, userPrompt);
   return callOpenAI(systemPrompt, userPrompt);
 }
 
@@ -45,12 +17,12 @@ async function callOpenAI(systemPrompt, userPrompt) {
     model: 'gpt-4o-mini',
     messages: [
       { role: 'system', content: systemPrompt },
-      { role: 'user',   content: userPrompt }
+      { role: 'user', content: userPrompt }
     ],
     temperature: 0.7,
     max_tokens: 2000
   }, {
-    headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
+    headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
     timeout: 30000
   });
   return res.data.choices[0].message.content.trim();
@@ -85,7 +57,6 @@ async function callGemini(systemPrompt, userPrompt) {
   return result.response.text().trim();
 }
 
-// ── Resume draft ──────────────────────────────────────────────────────────────
 async function draftResume(job, scoreDetails) {
   const system = `You are a professional resume writer helping a job seeker tailor their resume.
 RULES:
@@ -97,10 +68,10 @@ RULES:
 - Output JSON with keys: resume_text, change_summary, keywords_added (array), suggested_filename.`;
 
   const user = `CANDIDATE PROFILE:
-${MASTER_PROFILE}
+${getCandidateProfile()}
 
 MASTER RESUME SUMMARY:
-${MASTER_RESUME_SUMMARY}
+${getResumeSummary()}
 
 JOB TITLE: ${job.title}
 COMPANY: ${job.company}
@@ -121,26 +92,26 @@ Please produce a tailored resume draft for this role. Focus on operations, proce
   } catch (err) {
     logEvent('ai_error', `Resume draft failed for job #${job.id}: ${err.message}`, { jobId: job.id });
     return {
-      resume_text: `[AI draft unavailable — ${err.message}. Please write resume manually using the master profile.]`,
+      resume_text: `[AI draft unavailable - ${err.message}. Please write resume manually using the private candidate profile.]`,
       change_summary: 'AI draft failed',
       keywords_added: [],
-      suggested_filename: `Resume_${job.company.replace(/\s+/g,'_')}_${job.title.replace(/\s+/g,'_')}.docx`
+      suggested_filename: `Resume_${job.company.replace(/\s+/g, '_')}_${job.title.replace(/\s+/g, '_')}.docx`
     };
   }
 }
 
-// ── Cover letter draft ────────────────────────────────────────────────────────
 async function draftCoverLetter(job, scoreDetails) {
+  const portfolioUrl = getPortfolioUrl();
   const system = `You are a professional cover letter writer.
 RULES:
 - Professional but natural tone. No generic filler. No over-explaining career transition.
-- Mention portfolio (https://keandrajm.github.io/PM_Portfolio/) when relevant.
+- Mention the portfolio${portfolioUrl ? ` (${portfolioUrl})` : ''} only when relevant and only if provided.
 - Frame candidate as an operations/systems improvement professional moving into business ops, BI, PM, customer success, or process automation.
 - Keep it concise: 3-4 short paragraphs.
 - Output JSON with keys: cover_letter_text, angle_summary, suggested_filename.`;
 
   const user = `CANDIDATE PROFILE:
-${MASTER_PROFILE}
+${getCandidateProfile()}
 
 JOB TITLE: ${job.title}
 COMPANY: ${job.company}
@@ -159,21 +130,20 @@ Write a tailored cover letter. Output valid JSON only.`;
   } catch (err) {
     logEvent('ai_error', `Cover letter draft failed for job #${job.id}: ${err.message}`, { jobId: job.id });
     return {
-      cover_letter_text: `[AI draft unavailable — ${err.message}. Please write cover letter manually.]`,
+      cover_letter_text: `[AI draft unavailable - ${err.message}. Please write cover letter manually.]`,
       angle_summary: 'AI draft failed',
-      suggested_filename: `CoverLetter_${job.company.replace(/\s+/g,'_')}_${job.title.replace(/\s+/g,'_')}.docx`
+      suggested_filename: `CoverLetter_${job.company.replace(/\s+/g, '_')}_${job.title.replace(/\s+/g, '_')}.docx`
     };
   }
 }
 
-// ── Application answer library ────────────────────────────────────────────────
 async function draftApplicationAnswers(job) {
   const system = `You produce suggested answers for common job application questions.
 Rules: truthful, based on the provided candidate profile only. Concise, specific, professional.
 Output JSON with an array key "answers" where each item has: question, answer.`;
 
   const user = `CANDIDATE PROFILE:
-${MASTER_PROFILE}
+${getCandidateProfile()}
 
 JOB TITLE: ${job.title}
 COMPANY: ${job.company}
@@ -183,7 +153,7 @@ Generate suggested answers for:
 2. Why are you a good fit?
 3. Tell us about yourself.
 4. What are your salary expectations?
-5. Work authorization (US Citizen/Green Card/Visa)?
+5. Work authorization.
 6. Describe your remote work experience.
 7. Describe your project management experience.
 8. Describe your data/reporting experience.
@@ -200,7 +170,6 @@ Output valid JSON only.`;
   }
 }
 
-// ── Helper: extract JSON from possible markdown wrapper ───────────────────────
 function extractJSON(raw) {
   const cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
   return JSON.parse(cleaned);

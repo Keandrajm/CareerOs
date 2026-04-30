@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: careeros-backend
+    runtime: node
+    rootDir: backend
+    plan: starter
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    autoDeploy: true
+    disk:
+      name: careeros-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: /data/careeros.sqlite
+      - key: TZ
+        value: America/Los_Angeles
+      - key: CAREEROS_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: DASHBOARD_URL
+        sync: false
+      - key: AI_PROVIDER
+        value: openai
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: DISCORD_WEBHOOK_URL
+        sync: false
+      - key: DISCORD_CHAT_WEBHOOK_URL
+        sync: false
+      - key: DISCORD_BOT_TOKEN
+        sync: false
+      - key: CANDIDATE_PROFILE_TEXT
+        sync: false
+      - key: CANDIDATE_RESUME_SUMMARY
+        sync: false
+      - key: CANDIDATE_PORTFOLIO_URL
+        sync: false

@@ -154,7 +154,7 @@ function titleBucket(title = '', description = '') {
   const avoid = AVOID_TITLE_PATTERNS.find(({ pattern }) => pattern.test(titleText));
   if (avoid) return { bucket: 'avoid', reason: avoid.reason };
   if (STRONG_TITLE_PATTERNS.some(pattern => pattern.test(titleText))) {
-    return { bucket: 'strong', reason: 'Strong match to Keandra operations/process/project target titles' };
+    return { bucket: 'strong', reason: 'Strong match to operations/process/project target titles' };
   }
   if (SECONDARY_TITLE_PATTERNS.some(pattern => pattern.test(titleText))) {
     const hasContext = SECONDARY_REQUIRED_CONTEXT.some(pattern => pattern.test(fullText));
