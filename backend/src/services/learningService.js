@@ -97,29 +97,94 @@ function getActivePreferences() {
   }
 }
 
+function getManualPreferences() {
+  const row = db.prepare(`SELECT insight_json FROM system_insights WHERE insight_key = 'manual_discord_preferences'`).get();
+  if (!row?.insight_json) return { prefer: [], avoid: [], notes: [], updatedAt: null };
+  try {
+    const parsed = JSON.parse(row.insight_json);
+    return {
+      prefer: Array.isArray(parsed.prefer) ? parsed.prefer : [],
+      avoid: Array.isArray(parsed.avoid) ? parsed.avoid : [],
+      notes: Array.isArray(parsed.notes) ? parsed.notes : [],
+      updatedAt: parsed.updatedAt || null
+    };
+  } catch {
+    return { prefer: [], avoid: [], notes: [], updatedAt: null };
+  }
+}
+
+function saveManualPreferences(preferences) {
+  const payload = {
+    prefer: [...new Set((preferences.prefer || []).map(item => String(item).toLowerCase().trim()).filter(Boolean))].slice(0, 50),
+    avoid: [...new Set((preferences.avoid || []).map(item => String(item).toLowerCase().trim()).filter(Boolean))].slice(0, 50),
+    notes: (preferences.notes || []).slice(-50),
+    updatedAt: new Date().toISOString()
+  };
+
+  db.prepare(`
+    INSERT INTO system_insights (insight_key, insight_json, updated_at)
+    VALUES ('manual_discord_preferences', ?, ?)
+    ON CONFLICT(insight_key) DO UPDATE SET
+      insight_json = excluded.insight_json,
+      updated_at = excluded.updated_at
+  `).run(JSON.stringify(payload), payload.updatedAt);
+
+  logEvent('system_learning', 'Discord manual preferences updated', payload);
+  return payload;
+}
+
+function addManualPreference(type, phrase, source = 'discord') {
+  const cleanPhrase = String(phrase || '').toLowerCase().trim().replace(/^["']|["']$/g, '');
+  if (!cleanPhrase || cleanPhrase.length < 2) throw new Error('Preference phrase is too short');
+
+  const preferences = getManualPreferences();
+  const note = { type, phrase: cleanPhrase, source, createdAt: new Date().toISOString() };
+  if (type === 'prefer') preferences.prefer.push(cleanPhrase);
+  else if (type === 'avoid') preferences.avoid.push(cleanPhrase);
+  preferences.notes.push(note);
+  return saveManualPreferences(preferences);
+}
+
 function applyPreferenceAdjustment(job, scores) {
   const preferences = getActivePreferences();
-  if (!preferences || preferences.sampleSize < 3) return { ...scores, preference_adjustment: 0 };
+  const manualPreferences = getManualPreferences();
+  if ((!preferences || preferences.sampleSize < 3) && manualPreferences.prefer.length === 0 && manualPreferences.avoid.length === 0) {
+    return { ...scores, preference_adjustment: 0 };
+  }
 
   const text = `${job.title || ''} ${job.description || ''}`.toLowerCase();
   let adjustment = 0;
   const reasons = [];
 
-  for (const signal of preferences.positiveSignals || []) {
+  for (const phrase of manualPreferences.prefer || []) {
+    if (text.includes(phrase)) {
+      adjustment += 2;
+      reasons.push(`manual prefer: ${phrase}`);
+    }
+  }
+
+  for (const phrase of manualPreferences.avoid || []) {
+    if (text.includes(phrase)) {
+      adjustment -= 3;
+      reasons.push(`manual avoid: ${phrase}`);
+    }
+  }
+
+  for (const signal of preferences?.positiveSignals || []) {
     if (signal.count >= 2 && text.includes(signal.keyword)) {
       adjustment += 1;
       reasons.push(`positive signal: ${signal.keyword}`);
     }
   }
 
-  for (const signal of preferences.negativeSignals || []) {
+  for (const signal of preferences?.negativeSignals || []) {
     if (signal.count >= 2 && text.includes(signal.keyword)) {
       adjustment -= 1;
       reasons.push(`negative signal: ${signal.keyword}`);
     }
   }
 
-  if ((preferences.preferredCompanies || []).some(item => item.keyword === job.company && item.count >= 2)) {
+  if ((preferences?.preferredCompanies || []).some(item => item.keyword === job.company && item.count >= 2)) {
     adjustment += 2;
     reasons.push(`preferred company: ${job.company}`);
   }
@@ -141,4 +206,4 @@ function applyPreferenceAdjustment(job, scores) {
   };
 }
 
-module.exports = { learnPreferences, getActivePreferences, applyPreferenceAdjustment };
+module.exports = { learnPreferences, getActivePreferences, getManualPreferences, addManualPreference, applyPreferenceAdjustment };

@@ -8,6 +8,7 @@ const packetsRouter = require('./routes/packets');
 const approvalsRouter = require('./routes/approvals');
 const logsRouter = require('./routes/logs');
 const scheduler = require('./scheduler');
+const discordBotService = require('./services/discordBotService');
 const {
   requestId,
   securityHeaders,
@@ -79,6 +80,7 @@ app.listen(PORT, () => {
   console.log(`[CareerOS] API running on port ${PORT}`);
   console.log(`[CareerOS] Access key protection: ${process.env.CAREEROS_API_KEY ? 'enabled' : 'not configured'}`);
   scheduler.init();
+  discordBotService.init();
 });
 
 module.exports = app;

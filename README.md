@@ -72,6 +72,7 @@ ANTHROPIC_API_KEY=your-anthropic-api-key
 AI_PROVIDER=openai             # or: anthropic
 DISCORD_WEBHOOK_URL=your-discord-webhook-url
 DISCORD_CHAT_WEBHOOK_URL=your-discord-bot-chat-webhook-url
+DISCORD_BOT_TOKEN=your-discord-bot-token
 DASHBOARD_URL=http://localhost:5173
 ALLOWED_ORIGINS=http://localhost:5173
 CAREEROS_API_KEY=change-this-private-dashboard-key
@@ -185,6 +186,8 @@ const COMPANY_SLUGS = [
 
 The alert webhook is for concise notifications. The bot-chat webhook is for scan summaries, preference questions, learning digests, URL problems, and operational notes. Webhooks can post messages but cannot read replies; use dashboard actions such as approve, save, reject, and self-applied to teach CareerOS.
 
+For two-way Discord commands, invite the Discord bot to your server, enable the Message Content Intent in the Discord Developer Portal, and set `DISCORD_BOT_TOKEN`. Mention the bot or DM it with `help`, `status`, `prefer <phrase>`, `avoid <phrase>`, or `preferences`.
+
 ---
 
 ## Deploy to Railway
@@ -233,6 +236,7 @@ ALLOWED_ORIGINS=https://keandra-careeros.netlify.app
 | `AI_PROVIDER` | No | `openai` or `anthropic` (default: openai) |
 | `DISCORD_WEBHOOK_URL` | No | Discord webhook for notifications |
 | `DISCORD_CHAT_WEBHOOK_URL` | No | Separate Discord webhook for bot communication, preference questions, learning digests, and problem reports |
+| `DISCORD_BOT_TOKEN` | No | Discord bot token for two-way commands and preference updates |
 | `DASHBOARD_URL` | No | Frontend URL for Discord links |
 | `ALLOWED_ORIGINS` | Recommended | Comma-separated allowed dashboard origins |
 | `CAREEROS_API_KEY` | Recommended | Private dashboard access key required by API when set |

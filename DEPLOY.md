@@ -40,6 +40,7 @@ git push -u origin main
 | `OPENAI_API_KEY` | your key |
 | `DISCORD_WEBHOOK_URL` | your webhook |
 | `DISCORD_CHAT_WEBHOOK_URL` | your second bot-chat webhook |
+| `DISCORD_BOT_TOKEN` | your Discord bot token |
 | `AI_PROVIDER` | `openai` |
 | `DASHBOARD_URL` | `https://keandra-careeros.netlify.app` |
 | `ALLOWED_ORIGINS` | `https://keandra-careeros.netlify.app` |
