@@ -1,7 +1,7 @@
 /**
  * Lever Job Board Service
  *
- * Public API — no key required.
+ * Public API - no key required.
  * https://api.lever.co/v0/postings/{slug}?mode=json
  */
 
@@ -10,23 +10,10 @@ const { logEvent } = require('../routes/logs');
 
 const BASE_URL = 'https://api.lever.co/v0/postings';
 
-// Remote-friendly companies with ops/CS/analyst/PM roles on Lever
+// Slugs are verified against https://api.lever.co/v0/postings/{slug}?mode=json.
 const COMPANY_SLUGS = [
-  { slug: 'carta',          name: 'Carta' },
-  { slug: 'lattice',        name: 'Lattice' },
-  { slug: 'benchling',      name: 'Benchling' },
-  { slug: 'gem',            name: 'Gem' },
-  { slug: 'block',          name: 'Block (Square)' },
-  { slug: 'airtable',       name: 'Airtable' },
-  { slug: 'webflow',        name: 'Webflow' },
-  { slug: 'notion',         name: 'Notion' },
-  { slug: 'figma',          name: 'Figma' },
-  { slug: 'plaid',          name: 'Plaid' },
-  { slug: 'amplitude',      name: 'Amplitude' },
-  { slug: 'mixpanel',       name: 'Mixpanel' },
-  // ── 2 new additions (confirmed from live boards) ──────────────────────────
   { slug: 'spotify',        name: 'Spotify' },
-  { slug: 'reddit',         name: 'Reddit' },
+  { slug: 'plaid',          name: 'Plaid' },
 ];
 
 const TARGET_KEYWORDS = [
@@ -34,7 +21,8 @@ const TARGET_KEYWORDS = [
   'customer success', 'business operations', 'implementation',
   'data analyst', 'process improvement', 'onboarding specialist',
   'operations manager', 'biz ops', 'revenue operations', 'revops',
-  'ops specialist', 'ops coordinator', 'client success', 'account manager'
+  'ops specialist', 'ops coordinator', 'client success', 'account manager',
+  'business analyst', 'enablement', 'customer education'
 ];
 
 async function fetchJobsFromSlug(slug, companyName) {
@@ -64,9 +52,9 @@ function normalizeLeverJob(raw, companyName, slug) {
   const isRemote = /remote/i.test(raw.workplaceType || '') || /remote/i.test(raw.categories?.location || '');
   const location = raw.categories?.location || raw.workplaceType || '';
 
-  const salaryMatch = descriptionHTML.match(/\$([0-9,]+)\s*[–\-to]+\s*\$([0-9,]+)/i);
-  const salaryMin = salaryMatch ? parseInt(salaryMatch[1].replace(/,/g, '')) : null;
-  const salaryMax = salaryMatch ? parseInt(salaryMatch[2].replace(/,/g, '')) : null;
+  const salaryMatch = descriptionHTML.match(/\$([0-9,]+)\s*(?:-|to|\u2013)\s*\$([0-9,]+)/i);
+  const salaryMin = salaryMatch ? parseInt(salaryMatch[1].replace(/,/g, ''), 10) : null;
+  const salaryMax = salaryMatch ? parseInt(salaryMatch[2].replace(/,/g, ''), 10) : null;
 
   const postedDate = raw.createdAt
     ? new Date(raw.createdAt).toISOString().split('T')[0]
@@ -86,7 +74,7 @@ function normalizeLeverJob(raw, companyName, slug) {
     source_url: raw.hostedUrl || `https://jobs.lever.co/${slug}/${raw.id}`,
     company_career_url: `https://jobs.lever.co/${slug}`,
     description: descriptionHTML.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(),
-    description_snippet: `${raw.text} at ${companyName} — ${location}`.substring(0, 200),
+    description_snippet: `${raw.text} at ${companyName} - ${location}`.substring(0, 200),
     hard_filter_status: 'pending',
     status: 'new',
     label: 'unscored',
@@ -110,4 +98,4 @@ async function scanAll() {
   return allJobs;
 }
 
-module.exports = { scanAll, fetchJobsFromSlug };
+module.exports = { scanAll, fetchJobsFromSlug, COMPANY_SLUGS };

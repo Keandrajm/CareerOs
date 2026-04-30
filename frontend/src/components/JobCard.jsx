@@ -14,7 +14,7 @@ export default function JobCard({ job, onRefresh }) {
     setMsg(null);
     try {
       await fn(job.id);
-      setMsg({ text: label + ' ✓', type: 'success' });
+      setMsg({ text: `${label} saved`, type: 'success' });
       if (onRefresh) onRefresh();
     } catch (e) {
       setMsg({ text: e.response?.data?.error || e.message, type: 'error' });
@@ -28,7 +28,7 @@ export default function JobCard({ job, onRefresh }) {
     setMsg(null);
     try {
       await createPacket(job.id);
-      setMsg({ text: 'Packet created ✓', type: 'success' });
+      setMsg({ text: 'Packet created', type: 'success' });
       setShowPacket(true);
       if (onRefresh) onRefresh();
     } catch (e) {
@@ -42,7 +42,7 @@ export default function JobCard({ job, onRefresh }) {
     setLoading(true);
     try {
       await scoreJob(job.id);
-      setMsg({ text: 'Scored ✓', type: 'success' });
+      setMsg({ text: 'Score updated', type: 'success' });
       if (onRefresh) onRefresh();
     } catch (e) {
       setMsg({ text: e.response?.data?.error || e.message, type: 'error' });
@@ -60,10 +60,10 @@ export default function JobCard({ job, onRefresh }) {
           <div className="job-card-title">{job.title}</div>
           <div className="job-card-company">{job.company}</div>
           <div className="job-card-meta">
-            {job.salary_text && <span className="meta-pill">💰 {job.salary_text}</span>}
-            {job.remote_status && <span className="meta-pill">🌐 {job.remote_status}</span>}
-            {job.posted_date && <span className="meta-pill">📅 {job.posted_date}</span>}
-            {job.source_name && <span className="meta-pill">📡 {job.source_name}</span>}
+            {job.salary_text && <span className="meta-pill">Salary: {job.salary_text}</span>}
+            {job.remote_status && <span className="meta-pill">Workplace: {job.remote_status}</span>}
+            {job.posted_date && <span className="meta-pill">Posted: {job.posted_date}</span>}
+            {job.source_name && <span className="meta-pill">Source: {job.source_name}</span>}
             <StatusBadge status={job.status} />
           </div>
         </div>
@@ -75,17 +75,17 @@ export default function JobCard({ job, onRefresh }) {
       )}
 
       {job.scoreDetails?.why_it_matches && (
-        <div className="job-card-why">✅ {job.scoreDetails.why_it_matches}</div>
+        <div className="job-card-why">{job.scoreDetails.why_it_matches}</div>
       )}
       {job.scoreDetails?.missing_or_weak_requirements && job.scoreDetails.missing_or_weak_requirements !== 'None identified' && (
-        <div className="job-card-missing">⚠️ {job.scoreDetails.missing_or_weak_requirements}</div>
+        <div className="job-card-missing">{job.scoreDetails.missing_or_weak_requirements}</div>
       )}
       {job.red_flags && (
-        <div className="job-card-flags">🚩 {job.red_flags}</div>
+        <div className="job-card-flags">{job.red_flags}</div>
       )}
 
       {msg && (
-        <div style={{ fontSize: '0.8rem', marginTop: '0.4rem', color: msg.type === 'success' ? 'var(--green)' : 'var(--red)' }}>
+        <div style={{ fontSize: '0.8rem', marginTop: '0.4rem', color: msg.type === 'success' ? 'var(--green)' : 'var(--red)', fontWeight: 700 }}>
           {msg.text}
         </div>
       )}
@@ -93,31 +93,31 @@ export default function JobCard({ job, onRefresh }) {
       <div className="job-card-actions">
         {job.source_url && (
           <a href={job.source_url} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm">
-            🔗 View Job
+            View Job
           </a>
         )}
         <button className="btn btn-secondary btn-sm" onClick={handleScore} disabled={loading}>
-          📊 Score
+          Score
         </button>
         <button className="btn btn-secondary btn-sm" onClick={handlePacket} disabled={loading}>
-          📦 Generate Packet
+          Generate Packet
         </button>
         {(job.status === 'packet_ready' || job.scoreDetails) && (
           <button className="btn btn-secondary btn-sm" onClick={() => setShowPacket(!showPacket)}>
-            {showPacket ? '▲ Hide Packet' : '📄 View Packet'}
+            {showPacket ? 'Hide Packet' : 'View Packet'}
           </button>
         )}
         <button className="btn btn-green btn-sm" onClick={() => act(approveJob, 'Approved')} disabled={loading}>
-          ✓ Approve
+          Approve
         </button>
         <button className="btn btn-red btn-sm" onClick={() => act(rejectJob, 'Rejected')} disabled={loading}>
-          ✕ Reject
+          Reject
         </button>
         <button className="btn btn-yellow btn-sm" onClick={() => act(saveJob, 'Saved')} disabled={loading}>
-          🔖 Save
+          Save
         </button>
-        <button className="btn btn-secondary btn-sm" onClick={() => act(selfApplied, 'Self-Applied')} disabled={loading}>
-          ✍️ Self-Applied
+        <button className="btn btn-secondary btn-sm" onClick={() => act(selfApplied, 'Self-applied')} disabled={loading}>
+          Mark Self-Applied
         </button>
       </div>
 

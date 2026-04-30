@@ -1,7 +1,7 @@
 /**
  * Ashby Job Board Service
  *
- * Public API — no key required.
+ * Public API - no key required.
  * https://api.ashbyhq.com/posting-api/job-board/{slug}
  */
 
@@ -10,24 +10,35 @@ const { logEvent } = require('../routes/logs');
 
 const BASE_URL = 'https://api.ashbyhq.com/posting-api/job-board';
 
-// Remote-friendly companies with ops/CS/analyst/PM roles on Ashby
+// Slugs are verified against https://api.ashbyhq.com/posting-api/job-board/{slug}.
 const COMPANY_SLUGS = [
   { slug: 'ramp',           name: 'Ramp' },
-  { slug: 'brex',           name: 'Brex' },
-  { slug: 'rippling',       name: 'Rippling' },
   { slug: 'retool',         name: 'Retool' },
   { slug: 'linear',         name: 'Linear' },
   { slug: 'loom',           name: 'Loom' },
-  { slug: 'coda',           name: 'Coda' },
   { slug: 'mercury',        name: 'Mercury' },
   { slug: 'deel',           name: 'Deel' },
-  { slug: 'remote',         name: 'Remote.com (Ashby)' },
-  { slug: 'dbt-labs',       name: 'dbt Labs' },
   { slug: 'replit',         name: 'Replit' },
-  // ── 3 new additions (confirmed from live boards) ──────────────────────────
   { slug: 'openai',         name: 'OpenAI' },
   { slug: 'cohere',         name: 'Cohere' },
   { slug: 'frontcareers',   name: 'Front' },
+  { slug: 'cursor',         name: 'Cursor' },
+  { slug: 'clickup',        name: 'ClickUp' },
+  { slug: 'perplexity',     name: 'Perplexity' },
+  { slug: 'sentry',         name: 'Sentry' },
+  { slug: 'vercel',         name: 'Vercel' },
+  { slug: 'zapier',         name: 'Zapier' },
+  { slug: 'mistral',        name: 'Mistral AI' },
+  { slug: 'notion',         name: 'Notion' },
+  { slug: '1password',      name: '1Password' },
+  { slug: 'writer',         name: 'Writer' },
+  { slug: 'supabase',       name: 'Supabase' },
+  { slug: 'betterup',       name: 'BetterUp' },
+  { slug: 'modal',          name: 'Modal' },
+  { slug: 'incident',       name: 'incident.io' },
+  { slug: 'posthog',        name: 'PostHog' },
+  { slug: 'hightouch',      name: 'Hightouch' },
+  { slug: 'airtable',       name: 'Airtable' },
 ];
 
 const TARGET_KEYWORDS = [
@@ -35,7 +46,8 @@ const TARGET_KEYWORDS = [
   'customer success', 'business operations', 'implementation',
   'data analyst', 'process improvement', 'onboarding specialist',
   'operations manager', 'biz ops', 'revenue operations', 'revops',
-  'ops specialist', 'ops coordinator', 'client success', 'account manager'
+  'ops specialist', 'ops coordinator', 'client success', 'account manager',
+  'business analyst', 'enablement', 'customer education', 'support operations'
 ];
 
 async function fetchJobsFromSlug(slug, companyName) {
@@ -65,9 +77,9 @@ function normalizeAshbyJob(raw, companyName, slug) {
   const descText = (raw.descriptionPlain || raw.jobDescription || '')
     .replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 
-  const salaryMatch = descText.match(/\$([0-9,]+)\s*[–\-to]+\s*\$([0-9,]+)/i);
-  const salaryMin = salaryMatch ? parseInt(salaryMatch[1].replace(/,/g, '')) : null;
-  const salaryMax = salaryMatch ? parseInt(salaryMatch[2].replace(/,/g, '')) : null;
+  const salaryMatch = descText.match(/\$([0-9,]+)\s*(?:-|to|\u2013)\s*\$([0-9,]+)/i);
+  const salaryMin = salaryMatch ? parseInt(salaryMatch[1].replace(/,/g, ''), 10) : null;
+  const salaryMax = salaryMatch ? parseInt(salaryMatch[2].replace(/,/g, ''), 10) : null;
 
   const postedDate = raw.publishedAt
     ? new Date(raw.publishedAt).toISOString().split('T')[0]
@@ -87,7 +99,7 @@ function normalizeAshbyJob(raw, companyName, slug) {
     source_url: raw.jobUrl || `https://jobs.ashbyhq.com/${slug}/${raw.id}`,
     company_career_url: `https://jobs.ashbyhq.com/${slug}`,
     description: descText,
-    description_snippet: `${raw.title} at ${companyName} — ${raw.location || ''}`.substring(0, 200),
+    description_snippet: `${raw.title} at ${companyName} - ${raw.location || ''}`.substring(0, 200),
     hard_filter_status: 'pending',
     status: 'new',
     label: 'unscored',
@@ -111,4 +123,4 @@ async function scanAll() {
   return allJobs;
 }
 
-module.exports = { scanAll, fetchJobsFromSlug };
+module.exports = { scanAll, fetchJobsFromSlug, COMPANY_SLUGS };
