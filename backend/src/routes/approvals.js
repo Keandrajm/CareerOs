@@ -7,6 +7,10 @@ function updateJobStatus(jobId, status, action, notes = null) {
   const now = new Date().toISOString();
   db.prepare(`UPDATE jobs SET status = ?, updated_at = ? WHERE id = ?`).run(status, now, jobId);
   db.prepare(`INSERT INTO user_approvals (job_id, action, notes) VALUES (?, ?, ?)`).run(jobId, action, notes);
+  db.prepare(`
+    INSERT INTO application_status (job_id, status, notes, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(jobId, status, notes || null, now, now);
   logEvent('approval', `Job #${jobId} marked as ${action}`, { jobId, action, status });
 }
 

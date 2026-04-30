@@ -53,12 +53,32 @@ function hardFilter(job) {
     if (pattern.test(text)) return { passed: false, reason };
   }
 
-  if (job.remote_status && !['remote', 'hybrid'].includes(job.remote_status.toLowerCase())) {
-    return { passed: false, reason: 'Not remote or hybrid' };
+  if ((job.remote_status || '').toLowerCase() !== 'remote') {
+    return { passed: false, reason: 'Not confirmed remote' };
+  }
+
+  if (/\b(part[\s-]?time|contract only|temporary|seasonal)\b/i.test(text)) {
+    return { passed: false, reason: 'Not confirmed full-time' };
+  }
+
+  if (/\b(no us|not available in (the )?us|canada only|uk only|europe only|must be located outside the us)\b/i.test(text)) {
+    return { passed: false, reason: 'Not U.S. or California eligible' };
+  }
+
+  if (job.posted_date) {
+    const posted = new Date(job.posted_date + 'T00:00:00Z');
+    const cutoff = new Date(Date.now() - 7 * 86400000);
+    if (!Number.isNaN(posted.getTime()) && posted < cutoff) {
+      return { passed: false, reason: 'Posted more than 7 days ago' };
+    }
   }
 
   if (job.salary_max && job.salary_max < TARGET_SALARY_MIN) {
     return { passed: false, reason: `Salary too low: max $${job.salary_max.toLocaleString()} < $${TARGET_SALARY_MIN.toLocaleString()}` };
+  }
+
+  if (!job.salary_text && !job.salary_min && !job.salary_max) {
+    logEvent('missing_salary', `Job #${job.id || '?'} "${job.title}" has no visible salary`, { jobId: job.id, title: job.title });
   }
 
   return { passed: true, reason: null };

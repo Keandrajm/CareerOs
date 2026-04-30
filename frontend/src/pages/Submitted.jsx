@@ -6,15 +6,14 @@ import { toJobQuery } from '../filterParams.js';
 
 const EMPTY = { search: '', source: '', minScore: '', company: '', title: '', remoteStatus: '', salaryMin: '', salaryMax: '', postedAfter: '', postedBefore: '' };
 
-export default function Rejected() {
+export default function Submitted() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState(EMPTY);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const params = toJobQuery(filters, { status: 'rejected' });
-    const res = await getJobs(params);
+    const res = await getJobs(toJobQuery(filters, { status: 'self_applied' }));
     setJobs(res.data.jobs || []);
     setLoading(false);
   }, [filters]);
@@ -24,12 +23,12 @@ export default function Rejected() {
   return (
     <div>
       <div className="page-header">
-        <h1>🔴 Rejected Jobs</h1>
-        <p>Jobs filtered out automatically or rejected by you. Review hard filter reasons below.</p>
+        <h1>Submitted / Self-Applied</h1>
+        <p>Applications you marked as submitted manually, with follow-up dates tracked in the backend.</p>
       </div>
       <FilterBar filters={filters} onChange={setFilters} onReset={() => setFilters(EMPTY)} />
-      {loading ? <div className="loading">Loading…</div> : jobs.length === 0 ? (
-        <div className="empty-state"><div className="empty-icon">🔴</div><h3>No rejected jobs</h3><p>Rejected jobs appear here after filtering or manual rejection.</p></div>
+      {loading ? <div className="loading">Loading...</div> : jobs.length === 0 ? (
+        <div className="empty-state"><div className="empty-icon">DONE</div><h3>No submitted jobs yet</h3><p>Use Mark Self-Applied after you submit an application yourself.</p></div>
       ) : (
         <div className="job-grid">{jobs.map(j => <JobCard key={j.id} job={j} onRefresh={load} />)}</div>
       )}

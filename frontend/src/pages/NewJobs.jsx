@@ -3,8 +3,9 @@ import Dashboard from '../components/Dashboard.jsx';
 import JobCard from '../components/JobCard.jsx';
 import FilterBar from '../components/FilterBar.jsx';
 import { getJobs } from '../api.js';
+import { toJobQuery } from '../filterParams.js';
 
-const EMPTY_FILTERS = { search: '', label: '', status: 'new', source: '', minScore: '' };
+const EMPTY_FILTERS = { search: '', label: '', status: 'new', source: '', minScore: '', company: '', title: '', remoteStatus: '', salaryMin: '', salaryMax: '', postedAfter: '', postedBefore: '' };
 
 export default function NewJobs() {
   const [jobs, setJobs] = useState([]);
@@ -13,13 +14,7 @@ export default function NewJobs() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const params = {};
-    if (filters.search)   params.search   = filters.search;
-    if (filters.label)    params.label    = filters.label;
-    if (filters.source)   params.source   = filters.source;
-    if (filters.minScore) params.minScore = filters.minScore;
-    // Default: new jobs only
-    params.status = filters.status || 'new';
+    const params = toJobQuery(filters, { status: filters.status || 'new' });
     const res = await getJobs(params);
     setJobs(res.data.jobs || []);
     setLoading(false);

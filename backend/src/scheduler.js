@@ -94,11 +94,12 @@ function init() {
   const schedule = '0 9 * * *';
   if (cron.validate(schedule)) {
     cron.schedule(schedule, function() {
-      console.log('[Scheduler] Cron triggered — running daily scan');
+      console.log('[Scheduler] Cron triggered - running daily scan');
       runScan();
+    }, {
+      timezone: process.env.TZ || 'America/Los_Angeles'
     });
-    console.log('[Scheduler] Cron scheduled: ' + schedule + ' (server local time)');
-    console.log('[Scheduler] Set TZ=America/Los_Angeles in env for Pacific time.');
+    console.log('[Scheduler] Cron scheduled: ' + schedule + ' (' + (process.env.TZ || 'America/Los_Angeles') + ')');
   } else {
     console.error('[Scheduler] Invalid cron expression:', schedule);
   }

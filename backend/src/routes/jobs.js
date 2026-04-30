@@ -8,14 +8,33 @@ const { runScan } = require('../scheduler');
 
 router.get('/', (req, res) => {
   try {
-    const { status, label, minScore, source, company, search } = req.query;
+    const {
+      status,
+      label,
+      minScore,
+      source,
+      company,
+      search,
+      title,
+      remoteStatus,
+      salaryMin,
+      salaryMax,
+      postedAfter,
+      postedBefore
+    } = req.query;
     let query = 'SELECT * FROM jobs WHERE 1=1';
     const params = [];
     if (status)   { query += ' AND status = ?';              params.push(status); }
     if (label)    { query += ' AND label = ?';               params.push(label); }
     if (source)   { query += ' AND source_name = ?';         params.push(source); }
     if (company)  { query += ' AND company LIKE ?';          params.push('%'+company+'%'); }
+    if (title)    { query += ' AND title LIKE ?';            params.push('%'+title+'%'); }
+    if (remoteStatus) { query += ' AND remote_status = ?';   params.push(remoteStatus); }
     if (minScore) { query += ' AND score >= ?';              params.push(parseFloat(minScore)); }
+    if (salaryMin) { query += ' AND COALESCE(salary_max, salary_min, 0) >= ?'; params.push(parseFloat(salaryMin)); }
+    if (salaryMax) { query += ' AND COALESCE(salary_min, salary_max, 999999999) <= ?'; params.push(parseFloat(salaryMax)); }
+    if (postedAfter) { query += ' AND posted_date IS NOT NULL AND posted_date >= ?'; params.push(postedAfter); }
+    if (postedBefore) { query += ' AND posted_date IS NOT NULL AND posted_date <= ?'; params.push(postedBefore); }
     if (search) {
       query += ' AND (title LIKE ? OR company LIKE ? OR description_snippet LIKE ?)';
       const s = '%'+search+'%';

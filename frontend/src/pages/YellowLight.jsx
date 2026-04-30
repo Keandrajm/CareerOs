@@ -2,8 +2,9 @@ import React, { useEffect, useState, useCallback } from 'react';
 import JobCard from '../components/JobCard.jsx';
 import FilterBar from '../components/FilterBar.jsx';
 import { getJobs } from '../api.js';
+import { toJobQuery } from '../filterParams.js';
 
-const EMPTY = { search: '', status: '', source: '', minScore: '' };
+const EMPTY = { search: '', status: '', source: '', minScore: '', company: '', title: '', remoteStatus: '', salaryMin: '', salaryMax: '', postedAfter: '', postedBefore: '' };
 
 export default function YellowLight() {
   const [jobs, setJobs] = useState([]);
@@ -12,11 +13,7 @@ export default function YellowLight() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const params = { label: 'yellow' };
-    if (filters.search)   params.search   = filters.search;
-    if (filters.status)   params.status   = filters.status;
-    if (filters.source)   params.source   = filters.source;
-    if (filters.minScore) params.minScore = filters.minScore;
+    const params = toJobQuery(filters, { label: 'yellow' });
     const res = await getJobs(params);
     setJobs(res.data.jobs || []);
     setLoading(false);
