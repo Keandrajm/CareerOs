@@ -39,6 +39,7 @@ git push -u origin main
 | `DATABASE_URL` | `/data/careeros.sqlite` |
 | `OPENAI_API_KEY` | your key |
 | `DISCORD_WEBHOOK_URL` | your webhook |
+| `DISCORD_CHAT_WEBHOOK_URL` | your second bot-chat webhook |
 | `AI_PROVIDER` | `openai` |
 | `DASHBOARD_URL` | `https://keandra-careeros.netlify.app` |
 | `ALLOWED_ORIGINS` | `https://keandra-careeros.netlify.app` |
@@ -78,6 +79,7 @@ git push -u origin main
 - Set `CAREEROS_API_KEY` in Railway and enter that same value when the dashboard asks for access.
 - Set `DASHBOARD_URL` and `ALLOWED_ORIGINS` in Railway to `https://keandra-careeros.netlify.app`.
 - Do not put OpenAI, Gemini, Anthropic, or Discord secrets in Netlify.
+- Store both Discord webhooks only in Railway/local `.env`; never commit real webhook URLs.
 - Keep Netlify indexing disabled with the included `X-Robots-Tag` header.
 
 ---

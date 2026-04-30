@@ -161,6 +161,7 @@ async function runDailySystemCheck() {
     };
 
     logEvent('system_check_complete', `Daily system check complete: preferences updated, ${staleJobs} stale open jobs`, summary);
+    await discordService.notifySystemLearning(summary);
     return summary;
   } catch (err) {
     logEvent('error', 'Daily system check failed: ' + err.message, { error: err.message });

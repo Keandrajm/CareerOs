@@ -71,6 +71,7 @@ async function runDailyUrlCheck() {
 
   const summary = { checked, brokenCount: broken.length, broken: broken.slice(0, 20) };
   logEvent('url_check_complete', `Daily URL check complete: ${checked} checked, ${broken.length} broken`, summary);
+  await discordService.notifyUrlCheck(summary);
   if (broken.length > 0) {
     await discordService.notifyError('url-check', `${broken.length} CareerOS job links need review. Open Bot Logs for details.`);
   }

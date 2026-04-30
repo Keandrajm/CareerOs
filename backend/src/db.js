@@ -7,14 +7,38 @@ if (!process.env.DATABASE_URL) {
   require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 }
 
-const dbPath = process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('/')
+let dbPath = process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('/')
   ? process.env.DATABASE_URL
   : path.resolve(__dirname, '..', (process.env.DATABASE_URL || './src/data/careeros.sqlite').replace('./', ''));
 
-const dataDir = path.dirname(dbPath);
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+function ensureWritableDataPath(targetPath) {
+  const dataDir = path.dirname(targetPath);
+  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+  fs.accessSync(dataDir, fs.constants.W_OK);
+}
 
-const db = new DatabaseSync(dbPath);
+try {
+  ensureWritableDataPath(dbPath);
+} catch (err) {
+  const fallbackPath = path.resolve(__dirname, 'data', 'careeros.sqlite');
+  console.warn(`[DB] Cannot use DATABASE_URL path "${dbPath}": ${err.message}`);
+  console.warn(`[DB] Falling back to ${fallbackPath}. Add a Railway volume if you need persistence.`);
+  dbPath = fallbackPath;
+  ensureWritableDataPath(dbPath);
+}
+
+let db;
+try {
+  db = new DatabaseSync(dbPath);
+} catch (err) {
+  const fallbackPath = path.resolve(__dirname, 'data', 'careeros.sqlite');
+  if (dbPath === fallbackPath) throw err;
+  console.warn(`[DB] Failed to open "${dbPath}": ${err.message}`);
+  console.warn(`[DB] Falling back to ${fallbackPath}.`);
+  dbPath = fallbackPath;
+  ensureWritableDataPath(dbPath);
+  db = new DatabaseSync(dbPath);
+}
 db.exec('PRAGMA foreign_keys = ON');
 
 db.exec(`
